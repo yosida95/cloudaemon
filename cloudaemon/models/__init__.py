@@ -103,11 +103,13 @@ class TemplateMixin(object):
         self.attributes = {}
         for key in dir(self):
             value = getattr(self, key)
-            if key != u'_root' and\
-                    (isinstance(value, TemplateElement)
-                     or isinstance(value, TemplateMixin)):
-                self.attributes[key] = value.copy()
-                self._root.append(self.attributes[key])
+            if key != u'_root':
+                if isinstance(value, TemplateElement):
+                    self.attributes[key] = value.copy()
+                    self._root.append(self.attributes[key])
+                elif isinstance(value, TemplateMixin):
+                    self.attributes[key] = value.copy()
+                    self._root.append(self.attributes[key]._root)
 
     def copy(self):
         return self.__class__(**dict(self._root.items()))
