@@ -199,3 +199,75 @@ class DiskModel(ModelBase):
 
     def set_target_bus(self, value):
         self.target.set(u'bus', value)
+
+
+class GuestModel(ModelBase):
+
+    def __init__(self, **kwargs):
+        kwargs[u'type'] = u'kvm'
+        if u'uuid' not in kwargs:
+            raise AssertionError
+
+        if u'name' not in kwargs:
+            raise AssertionError
+
+        uuid = kwargs.get(u'uuid')
+        name = kwargs.get(u'name')
+        del kwargs[u'uuid']
+        del kwargs[u'name']
+
+        super(GuestModel, self).__init__(u'guest', **kwargs)
+
+        self.root.append(self.create_text_element(u'uuid', uuid))
+        self.root.append(self.create_text_element(u'name', name))
+
+        os = self.create_text_element(u'os', u'hvm')
+        os_type = self.create_element(u'type', arch=u'i686')
+        os.append(os_type)
+        os.append(self.create_element(u'boot', dev=u'cdrom'))
+        os.append(self.create_element(u'boot', dev=u'hd'))
+        os.append(self.create_element(u'bootmenu', enable=u'yes'))
+        self.root.append(os)
+
+        self.root.append(self.create_element(u'clock', offset=u'utc'))
+
+        self.root.append(self.create_text_element(u'on_poweroff', u'destroy'))
+        self.root.append(self.create_text_element(u'on_reboot', u'restart'))
+        self.root.append(self.create_text_element(u'on_crash', u'restart'))
+
+        self.vcpu = self.create_element(u'vcpu')
+        self.root.append(self.vcpu)
+
+        self.memory = self.create_element(u'memory', unit=u'KiB')
+        self.root.append(self.memory)
+
+        self._currentMemory = self.create_element(u'currentMemory',
+                                                  unit=u'KiB')
+        self.root.append(self._currentMemory)
+
+        self.devices = self.create_element(u'devices')
+        self.devices.append(
+            self.create_text_element(u'emulator', config.host.emulator)
+        )
+        self.root.append(self.devices)
+
+    def validate(self):
+        try:
+            assert self.vcpu.get_text()
+            assert self.memory.get_text()
+            assert self._currentMemory.get_text()
+        except KeyError:
+            raise AssertionError
+
+    def set_vcpu(self, value):
+        self.vcpu.set_text(value)
+
+    def set_memory(self, value):
+        self.memory.set_text(value)
+        self._currentMemory.set_text(value)
+
+    def append_device(self, value):
+        self.devices.append(value)
+
+    def remove_device(self, value):
+        self.devices.remove(value)

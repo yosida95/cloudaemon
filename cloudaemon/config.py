@@ -17,6 +17,7 @@ class Configurator(object):
 
 
 host = Configurator({
+    u'emulator': u'/usr/local/bin/qemu-system-x86_64',
     u'network': {
         u'bridge': u'br0'
     }
