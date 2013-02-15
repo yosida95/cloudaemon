@@ -114,3 +114,41 @@ class InterfaceModel(ModelBase):
 
     def set_model_type(self, value):
         self.model.set(u'type', value)
+
+
+class SerialModel(ModelBase):
+
+    def __init__(self, **kwargs):
+        kwargs[u'type'] = u'pty'
+        super(InterfaceModel, self).__init__(u'serial', **kwargs)
+
+        self.target = self.create_element(u'target')
+        self.root.append(self.target)
+
+    def validate(self):
+        try:
+            assert self.target.get(u'port')
+        except KeyError:
+            raise AssertionError
+
+    def set_target_port(self, value):
+        self.target.set(u'port', value)
+
+
+class ConsoleModel(ModelBase):
+
+    def __init__(self, **kwargs):
+        kwargs[u'type'] = u'pty'
+        super(InterfaceModel, self).__init__(u'console', **kwargs)
+
+        self.target = self.create_element(u'target')
+        self.root.append(self.target)
+
+    def validate(self):
+        try:
+            assert self.target.get(u'port')
+        except KeyError:
+            raise AssertionError
+
+    def set_target_port(self, value):
+        self.target.set(u'port', value)
