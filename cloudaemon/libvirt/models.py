@@ -152,3 +152,50 @@ class ConsoleModel(ModelBase):
 
     def set_target_port(self, value):
         self.target.set(u'port', value)
+
+
+class DiskModel(ModelBase):
+
+    def __init__(self, **kwargs):
+        assert kwargs.get(u'device')
+        kwargs[u'type'] = u'file'
+        super(DiskModel, self).__init__(u'disk', **kwargs)
+
+        self.driver = self.create_element(u'driver',
+                                          name=u'qemu', cache=u'none')
+        self.root.append(self.driver)
+
+        self.source = self.create_element(u'source')
+        self.root.append(self.source)
+
+        self.target = self.create_element(u'target')
+        self.root.append(self.target)
+
+        self.readonly = self.create_element(u'readonly')
+
+    def validate(self):
+        try:
+            assert self.source.get(u'file')
+            assert self.driver.get(u'type')
+            assert self.target.get(u'dev')
+            assert self.target.get(u'bus')
+        except KeyError:
+            raise AssertionError
+
+    def set_readonly(self, readonly=True):
+        if readonly:
+            self.root.append(self.readonly)
+        else:
+            self.root.remove(self.readonly)
+
+    def set_source_file(self, value):
+        self.source.set(u'file', value)
+
+    def set_driver_type(self, value):
+        self.driver.set(u'type', value)
+
+    def set_target_dev(self, value):
+        self.target.set(u'dev', value)
+
+    def set_target_bus(self, value):
+        self.target.set(u'bus', value)
