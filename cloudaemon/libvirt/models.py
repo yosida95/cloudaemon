@@ -15,6 +15,7 @@ class XMLElement(object):
         self.attrib = dict((unicode(key), unicode(value))
                            for key, value in attrib.items())
         self._children = []
+        self._text = None
 
     def get(self, key):
         return self.attrib[unicode(key)]
@@ -50,6 +51,8 @@ class XMLElement(object):
 
     def build(self):
         root = Element(self.tag, attrib=self.attrib)
+        if self._text:
+            root.text = self._text
         for child in self._children:
             root.append(child.build())
 
