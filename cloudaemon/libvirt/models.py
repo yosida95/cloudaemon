@@ -224,8 +224,9 @@ class GuestModel(ModelBase):
         self.root.append(self.create_text_element(u'uuid', uuid))
         self.root.append(self.create_text_element(u'name', name))
 
-        os = self.create_text_element(u'os', u'hvm')
-        os_type = self.create_element(u'type', arch=u'i686')
+        os = self.create_element(u'os')
+        os_type = self.create_text_element(u'type', u'hvm')
+        os_type.set(u'arch', u'i686')
         os.append(os_type)
         os.append(self.create_element(u'boot', dev=u'cdrom'))
         os.append(self.create_element(u'boot', dev=u'hd'))
